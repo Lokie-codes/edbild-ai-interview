@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Phone Number OTP Authentication</title>
+</head>
+<body>
+    <h1>Phone Number OTP Authentication</h1>
+    <div id="otpForm">
+        <label for="phoneNumber">Phone Number:</label>
+        <input type="text" id="phoneNumber" name="phoneNumber" required>
+        <button onclick="generateOTP()">Generate OTP</button>
+    </div>
+    <div id="otpVerificationForm" style="display: none;">
+        <label for="otp">Enter OTP:</label>
+        <input type="text" id="otp" name="otp" required>
+        <button onclick="verifyOTP()">Verify OTP</button>
+    </div>
+    <div id="message"></div>
+
+    <script>
+        function generateOTP() {
+            const phoneNumber = document.getElementById('phoneNumber').value;
+            const data = { phone_number: phoneNumber };
+
+            fetch('/auth/generate_otp/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('message').innerText = data.message;
+                document.getElementById('otpForm').style.display = 'none';
+                document.getElementById('otpVerificationForm').style.display = 'block';
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+        function verifyOTP() {
+            const phoneNumber = document.getElementById('phoneNumber').value;
+            const otp = document.getElementById('otp').value;
+            const data = { phone_number: phoneNumber, otp: otp };
+
+            fetch('/auth/verify_otp/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('message').innerText = data.message;
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+        function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+        }
+    </script>
+</body>
+</html>

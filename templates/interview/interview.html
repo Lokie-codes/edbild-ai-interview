@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Interview Page</title>
+    </head>
+    <body>
+        <!-- django template -->
+        <h1>Interview Page</h1>
+        {% block content %}
+        {% load static %}
+        <div>
+            {{ user.username }}
+            <h2>Role : {{ role }}</h2>
+            {% for question in questions %}
+            <div>
+                {{ question.content }}
+                <form action method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="question_id"
+                        value="{{ question.id }} " id="question_id">
+                    <input type="hidden" name="role" value="{{ role }}"
+                        id="role">
+                    <input type="hidden" name="user_id"
+                        value="{{ user.username }}" id="user_id">
+                    <input type="hidden" name="email" value="{{ user.email }}"
+                        id="email">
+                    <input type="hidden" name="phone_number"
+                        value="{{ user.phone_number }}" id="phone_number">
+                    <div>
+                        <label for="answer">Your Answer</label>
+                        <button type="button" id="startButton">Start Recording</button>
+                        <button id="stopButton" disabled>Stop Recording</button>
+                        <audio controls></audio>
+                    </div>
+                </form>
+            </div>
+            {% endfor %}
+            <a href="{% url 'answer' %}">Evaluate</a>
+        </div>
+
+        <script src="{% static 'js/voice-recorder.js' %}"></script>
+        {% endblock content %}
+    </body>
+</html>
